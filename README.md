@@ -1,12 +1,12 @@
-# Checkmk extension for ...
+# Checkmk extension for APC RackPDU Sensors
 
-![build](https://github.com/jiuka/checkmk_phion/workflows/build/badge.svg)
-![flake8](https://github.com/jiuka/checkmk_phion/workflows/Lint/badge.svg)
-![pytest](https://github.com/jiuka/checkmk_phion/workflows/pytest/badge.svg)
+![build](https://github.com/jiuka/checkmk_apc_rackpdu_sensor/workflows/build/badge.svg)
+![flake8](https://github.com/jiuka/checkmk_apc_rackpdu_sensor/workflows/Lint/badge.svg)
+![pytest](https://github.com/jiuka/checkmk_apc_rackpdu_sensor/workflows/pytest/badge.svg)
 
 ## Description
 
-This is a template to develop Checkmk Extensions
+Checkmk Extensions to monitor sensors connected to a APC RackPDU.
 
 ## Development
 
