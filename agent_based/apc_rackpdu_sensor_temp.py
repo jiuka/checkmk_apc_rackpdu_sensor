@@ -27,6 +27,7 @@
 # .1.3.6.1.4.1.318.1.1.26.10.2.2.1.9.1 4 --> PowerNet-MIB::rPDU2SensorTempHumidityStatusTempStatus.1
 
 from .agent_based_api.v1 import (
+    get_value_store,
     all_of,
     exists,
     register,
@@ -108,6 +109,7 @@ def check_apc_rackpdu_sensor_temp(item, params, section):
         reading=temperature,
         params=params,
         unique_name='check_apc_rackpdu_sensor_temp.%s' % item,
+        value_store=get_value_store(),
         dev_levels=(warn, crit),
         dev_status=APC_RACKPDU_SENSOR_LEVEL_STATES[status],
         dev_status_name=item,
