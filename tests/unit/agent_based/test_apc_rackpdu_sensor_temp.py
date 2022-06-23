@@ -29,6 +29,10 @@ from cmk.base.plugins.agent_based.agent_based_api.v1 import (
 from cmk.base.plugins.agent_based import apc_rackpdu_sensor_temp
 
 
+def get_value_store():
+    return {}
+
+
 @pytest.mark.parametrize('string_table, result', [
     (
         [[], []], {}
@@ -85,7 +89,8 @@ def test_discovery_apc_rackpdu_sensor_temp(section, result):
         ]
     ),
 ])
-def test_check_apc_rackpdu_sensor_temp(item, params, section, result):
+def test_check_apc_rackpdu_sensor_temp(monkeypatch, item, params, section, result):
+    monkeypatch.setattr(apc_rackpdu_sensor_temp, 'get_value_store', get_value_store)
     assert list(apc_rackpdu_sensor_temp.check_apc_rackpdu_sensor_temp(item, params, section)) == result
 
 
@@ -127,5 +132,6 @@ def test_check_apc_rackpdu_sensor_temp(item, params, section, result):
         Result(state=State.OK, summary='Temperature: 295.5K'),
     ),
 ])
-def test_check_apc_rackpdu_sensor_temp_w_param(params, result):
+def test_check_apc_rackpdu_sensor_temp_w_param(monkeypatch, params, result):
+    monkeypatch.setattr(apc_rackpdu_sensor_temp, 'get_value_store', get_value_store)
     assert result in list(apc_rackpdu_sensor_temp.check_apc_rackpdu_sensor_temp('SensorName', params, {'SensorName': [22.4, 4, 60, 59]},))
