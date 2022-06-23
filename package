@@ -15,8 +15,8 @@
     },
     'name': 'apc_rackpdu_sensors',
     'title': u'APC RackPDU Sensor SNMP Checks for Checkmk',
-    'version': '1.0',
-    'version.min_required': '2.0.0b6',
-    'version.packaged': '2.0.0',
-    'version.usable_until': '2.1.0'
+    'version': '1.1',
+    'version.min_required': '2.1.0',
+    'version.packaged': '2.1.0',
+    'version.usable_until': '2.2.0'
 }
