@@ -73,7 +73,7 @@ def test_discovery_apc_rackpdu_sensor_temp(section, result):
         {'SensorName': [24.4, 4, 60, 59]},
         [
             Metric('temp', 24.4, levels=(60.0, 59.0)),
-            Result(state=State.OK, summary='Temperature: 24.4°C'),
+            Result(state=State.OK, summary='Temperature: 24.4 °C'),
             Result(state=State.OK, notice='State on device: SensorName'),
             Result(state=State.OK, notice='Configuration: prefer user levels over device levels (used device levels)'),
         ]
@@ -83,7 +83,7 @@ def test_discovery_apc_rackpdu_sensor_temp(section, result):
         {'SensorName': [24.4, 4, 60, 59]},
         [
             Metric('temp', 24.4, levels=(60.0, 59.0)),
-            Result(state=State.OK, summary='Temperature: 24.4°C'),
+            Result(state=State.OK, summary='Temperature: 24.4 °C'),
             Result(state=State.OK, notice='State on device: SensorName'),
             Result(state=State.OK, notice='Configuration: prefer user levels over device levels (used device levels)'),
         ]
@@ -97,39 +97,39 @@ def test_check_apc_rackpdu_sensor_temp(monkeypatch, item, params, section, resul
 @pytest.mark.parametrize('params, result', [
     (
         {'levels': (24, 26)},
-        Result(state=State.OK, summary='Temperature: 22.4°C'),
+        Result(state=State.OK, summary='Temperature: 22.4 °C'),
     ),
     (
         {'levels': (18, 26)},
-        Result(state=State.WARN, summary='Temperature: 22.4°C (warn/crit at 18°C/26°C)'),
+        Result(state=State.WARN, summary='Temperature: 22.4 °C (warn/crit at 18 °C/26 °C)'),
     ),
     (
         {'levels': (18, 20)},
-        Result(state=State.CRIT, summary='Temperature: 22.4°C (warn/crit at 18°C/20°C)'),
+        Result(state=State.CRIT, summary='Temperature: 22.4 °C (warn/crit at 18 °C/20 °C)'),
     ),
     (
         {'levels_lower': (20, 18)},
-        Result(state=State.OK, summary='Temperature: 22.4°C'),
+        Result(state=State.OK, summary='Temperature: 22.4 °C'),
     ),
     (
         {'levels_lower': (26, 18)},
-        Result(state=State.WARN, summary='Temperature: 22.4°C (warn/crit below 26°C/18°C)'),
+        Result(state=State.WARN, summary='Temperature: 22.4 °C (warn/crit below 26 °C/18 °C)'),
     ),
     (
         {'levels_lower': (26, 24)},
-        Result(state=State.CRIT, summary='Temperature: 22.4°C (warn/crit below 26°C/24°C)'),
+        Result(state=State.CRIT, summary='Temperature: 22.4 °C (warn/crit below 26 °C/24 °C)'),
     ),
     (
         {'output_unit': 'c'},
-        Result(state=State.OK, summary='Temperature: 22.4°C'),
+        Result(state=State.OK, summary='Temperature: 22.4 °C'),
     ),
     (
         {'output_unit': 'f'},
-        Result(state=State.OK, summary='Temperature: 72.3°F'),
+        Result(state=State.OK, summary='Temperature: 72.3 °F'),
     ),
     (
         {'output_unit': 'k'},
-        Result(state=State.OK, summary='Temperature: 295.5K'),
+        Result(state=State.OK, summary='Temperature: 295.5 K'),
     ),
 ])
 def test_check_apc_rackpdu_sensor_temp_w_param(monkeypatch, params, result):
