@@ -3,7 +3,7 @@
 #
 # checkmk_apc_rackpdu_sensor - Checkmk extension for APC RackPDU Sensors
 #
-# Copyright (C) 2021  Marius Rieder <marius.rieder@scs.ch>
+# Copyright (C) 2021-2024  Marius Rieder <marius.rieder@durchmesser.ch>
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License
@@ -26,17 +26,18 @@
 # .1.3.6.1.4.1.318.1.1.26.10.2.2.1.8.1 239 --> PowerNet-MIB::rPDU2SensorTempHumidityStatusTempC.1
 # .1.3.6.1.4.1.318.1.1.26.10.2.2.1.9.1 4 --> PowerNet-MIB::rPDU2SensorTempHumidityStatusTempStatus.1
 
-from .agent_based_api.v1 import (
-    get_value_store,
+from cmk.agent_based.v2 import (
     all_of,
+    CheckPlugin,
     exists,
-    register,
+    get_value_store,
     Service,
+    SNMPSection,
     SNMPTree,
     startswith,
     State,
 )
-from .utils.temperature import (
+from cmk.plugins.lib.temperature import (
     check_temperature,
 )
 
@@ -66,7 +67,7 @@ def parse_apc_rackpdu_sensor_temp(string_table):
     return parsed
 
 
-register.snmp_section(
+snmp_section_apc_rackpdu_sensor_temp = SNMPSection(
     name='apc_rackpdu_sensor_temp',
     detect=all_of(
         startswith('.1.3.6.1.2.1.1.1.0', 'APC Web/SNMP'),
@@ -116,7 +117,7 @@ def check_apc_rackpdu_sensor_temp(item, params, section):
     )
 
 
-register.check_plugin(
+check_plugin_apc_rackpdu_sensor_temp = CheckPlugin(
     name='apc_rackpdu_sensor_temp',
     service_name='%s Temperature',
     discovery_function=discovery_apc_rackpdu_sensor_temp,
