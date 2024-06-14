@@ -1,0 +1,128 @@
+#!/usr/bin/env python3
+# -*- encoding: utf-8; py-indent-offset: 4 -*-
+#
+# checkmk_apc_netbotz50 - Checkmk extension for Dell Rack PDUs
+#
+# Copyright (C) 2021-2024  Marius Rieder <marius.rieder@durchmesser.ch>
+#
+# This program is free software; you can redistribute it and/or
+# modify it under the terms of the GNU General Public License
+# as published by the Free Software Foundation; either version 2
+# of the License, or (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program; if not, write to the Free Software
+# Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+
+import pytest  # type: ignore[import]
+from cmk.agent_based.v2 import (
+    Metric,
+    Result,
+    Service,
+    State,
+)
+from cmk_addons.plugins.apc_rackpdu_sensors.agent_based import apc_netbotz50_sensor_humidity
+
+
+@pytest.mark.parametrize('string_table, result', [
+    (
+        [], {}
+    ),
+    (
+        [['420', '0', 'SensorName', '42%']],
+        {'SensorName': [42.0, 0, '42%']}
+    ),
+])
+def test_parse_apc_netbotz50_sensor_humidity(string_table, result):
+    assert apc_netbotz50_sensor_humidity.parse_apc_netbotz50_sensor_humidity(string_table) == result
+
+
+@pytest.mark.parametrize('section, result', [
+    ({}, []),
+    (
+        {'SensorName': [42.0, 0, '42%']},
+        [Service(item='SensorName')]
+    ),
+])
+def test_discovery_apc_netbotz50_sensor_humidity(section, result):
+    assert list(apc_netbotz50_sensor_humidity.discovery_apc_netbotz50_sensor_humidity(section)) == result
+
+
+@pytest.mark.parametrize('item, params, section, result', [
+    ('', {}, {}, []),
+    (
+        'foo', {},
+        {'SensorName': [28.0, 0, '28%']},
+        []
+    ),
+    (
+        'SensorName', {},
+        {'SensorName': [28.0, 0, '28%']},
+        [
+            Result(state=State.OK, notice='Sensor State: Normal'),
+            Result(state=State.OK, summary='28.00%'),
+            Metric('humidity', 28.0, boundaries=(0.0, 100.0))
+        ]
+    ),
+    (
+        'SensorName', {'levels_lower': (30, 20)},
+        {'SensorName': [28.0, 0, '28%']},
+        [
+            Result(state=State.OK, notice='Sensor State: Normal'),
+            Result(state=State.WARN, summary='28.00% (warn/crit below 30.00%/20.00%)'),
+            Metric('humidity', 28.0, boundaries=(0.0, 100.0))
+        ]
+    ),
+    (
+        'SensorName', {'levels_lower': (30, 29)},
+        {'SensorName': [28.0, 0, '28%']},
+        [
+            Result(state=State.OK, notice='Sensor State: Normal'),
+            Result(state=State.CRIT, summary='28.00% (warn/crit below 30.00%/29.00%)'),
+            Metric('humidity', 28.0, boundaries=(0.0, 100.0))
+        ]
+    ),
+    (
+        'SensorName', {'levels': (20, 30)},
+        {'SensorName': [28.0, 0, '28%']},
+        [
+            Result(state=State.OK, notice='Sensor State: Normal'),
+            Result(state=State.WARN, summary='28.00% (warn/crit at 20.00%/30.00%)'),
+            Metric('humidity', 28.0, levels=(20.0, 30.0), boundaries=(0.0, 100.0))
+        ]
+    ),
+    (
+        'SensorName', {'levels': (20, 25)},
+        {'SensorName': [28.0, 0, '28%']},
+        [
+            Result(state=State.OK, notice='Sensor State: Normal'),
+            Result(state=State.CRIT, summary='28.00% (warn/crit at 20.00%/25.00%)'),
+            Metric('humidity', 28.0, levels=(20.0, 25.0), boundaries=(0.0, 100.0))
+        ]
+    ),
+    (
+        'SensorName', {},
+        {'SensorName': [28.0, 2, '28%']},
+        [
+            Result(state=State.WARN, notice='Sensor State: Warning'),
+            Result(state=State.OK, summary='28.00%'),
+            Metric('humidity', 28.0, boundaries=(0.0, 100.0))
+        ]
+    ),
+    (
+        'SensorName', {},
+        {'SensorName': [28.0, 5, '28%']},
+        [
+            Result(state=State.CRIT, notice='Sensor State: Failure'),
+            Result(state=State.OK, summary='28.00%'),
+            Metric('humidity', 28.0, boundaries=(0.0, 100.0))
+        ]
+    ),
+])
+def test_check_apc_netbotz50_sensor_humidity(item, params, section, result):
+    assert list(apc_netbotz50_sensor_humidity.check_apc_netbotz50_sensor_humidity(item, params, section)) == result

@@ -30,7 +30,6 @@ from cmk.agent_based.v2 import (
     all_of,
     CheckPlugin,
     exists,
-    render,
     Service,
     SNMPSection,
     SNMPTree,
