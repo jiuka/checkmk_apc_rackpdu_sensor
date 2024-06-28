@@ -34,8 +34,8 @@ from cmk_addons.plugins.apc_rackpdu_sensors.agent_based import apc_netbotz50_sen
         [], {}
     ),
     (
-        [['420', '0', 'SensorName', '42%']],
-        {'SensorName': [42.0, 0, '42%']}
+        [['SensorName', '42', '0']],
+        {'SensorName': [42.0, 0]}
     ),
 ])
 def test_parse_apc_netbotz50_sensor_humidity(string_table, result):
@@ -45,7 +45,7 @@ def test_parse_apc_netbotz50_sensor_humidity(string_table, result):
 @pytest.mark.parametrize('section, result', [
     ({}, []),
     (
-        {'SensorName': [42.0, 0, '42%']},
+        {'SensorName': [42.0, 0]},
         [Service(item='SensorName')]
     ),
 ])
@@ -57,12 +57,12 @@ def test_discovery_apc_netbotz50_sensor_humidity(section, result):
     ('', {}, {}, []),
     (
         'foo', {},
-        {'SensorName': [28.0, 0, '28%']},
+        {'SensorName': [28.0, 0]},
         []
     ),
     (
         'SensorName', {},
-        {'SensorName': [28.0, 0, '28%']},
+        {'SensorName': [28.0, 0]},
         [
             Result(state=State.OK, notice='Sensor State: Normal'),
             Result(state=State.OK, summary='28.00%'),
@@ -71,7 +71,7 @@ def test_discovery_apc_netbotz50_sensor_humidity(section, result):
     ),
     (
         'SensorName', {'levels_lower': (30, 20)},
-        {'SensorName': [28.0, 0, '28%']},
+        {'SensorName': [28.0, 0]},
         [
             Result(state=State.OK, notice='Sensor State: Normal'),
             Result(state=State.WARN, summary='28.00% (warn/crit below 30.00%/20.00%)'),
@@ -80,7 +80,7 @@ def test_discovery_apc_netbotz50_sensor_humidity(section, result):
     ),
     (
         'SensorName', {'levels_lower': (30, 29)},
-        {'SensorName': [28.0, 0, '28%']},
+        {'SensorName': [28.0, 0]},
         [
             Result(state=State.OK, notice='Sensor State: Normal'),
             Result(state=State.CRIT, summary='28.00% (warn/crit below 30.00%/29.00%)'),
@@ -89,7 +89,7 @@ def test_discovery_apc_netbotz50_sensor_humidity(section, result):
     ),
     (
         'SensorName', {'levels': (20, 30)},
-        {'SensorName': [28.0, 0, '28%']},
+        {'SensorName': [28.0, 0]},
         [
             Result(state=State.OK, notice='Sensor State: Normal'),
             Result(state=State.WARN, summary='28.00% (warn/crit at 20.00%/30.00%)'),
@@ -98,7 +98,7 @@ def test_discovery_apc_netbotz50_sensor_humidity(section, result):
     ),
     (
         'SensorName', {'levels': (20, 25)},
-        {'SensorName': [28.0, 0, '28%']},
+        {'SensorName': [28.0, 0]},
         [
             Result(state=State.OK, notice='Sensor State: Normal'),
             Result(state=State.CRIT, summary='28.00% (warn/crit at 20.00%/25.00%)'),
@@ -107,7 +107,7 @@ def test_discovery_apc_netbotz50_sensor_humidity(section, result):
     ),
     (
         'SensorName', {},
-        {'SensorName': [28.0, 2, '28%']},
+        {'SensorName': [28.0, 2]},
         [
             Result(state=State.WARN, notice='Sensor State: Warning'),
             Result(state=State.OK, summary='28.00%'),
@@ -116,7 +116,7 @@ def test_discovery_apc_netbotz50_sensor_humidity(section, result):
     ),
     (
         'SensorName', {},
-        {'SensorName': [28.0, 5, '28%']},
+        {'SensorName': [28.0, 5]},
         [
             Result(state=State.CRIT, notice='Sensor State: Failure'),
             Result(state=State.OK, summary='28.00%'),

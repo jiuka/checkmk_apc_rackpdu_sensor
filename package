@@ -4,6 +4,7 @@
     'download_url': 'https://github.com/jiuka/checkmk_apc_rackpdu_sensors/releases',
     'files': {
         'cmk_addons_plugins': [
+            'apc_rackpdu_sensors/agent_based/apc_netbotz50_sensor_humidity.py',
             'apc_rackpdu_sensors/agent_based/apc_rackpdu_sensor_humidity.py',
             'apc_rackpdu_sensors/agent_based/apc_rackpdu_sensor_temp.py',
         ],

@@ -19,12 +19,15 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-# .1.3.6.1.4.1.318.1.1.26.10.2.1.1.3.1 SensorName --> PowerNet-MIB::rPDU2SensorTempHumidityConfigName.1
-# .1.3.6.1.4.1.318.1.1.26.10.2.1.1.13.1 15 --> PowerNet-MIB::rPDU2SensorTempHumidityConfigHumidityLowThresh.1
-# .1.3.6.1.4.1.318.1.1.26.10.2.1.1.14.1 10 --> PowerNet-MIB::rPDU2SensorTempHumidityConfigHumidityMinThresh.1
-# .1.3.6.1.4.1.318.1.1.26.10.2.2.1.3.1 SensorName --> PowerNet-MIB::rPDU2SensorTempHumidityStatusName.1
-# .1.3.6.1.4.1.318.1.1.26.10.2.2.1.10.1 10 --> PowerNet-MIB::rPDU2SensorTempHumidityStatusRelativeHumidity.1
-# .1.3.6.1.4.1.318.1.1.26.10.2.2.1.11.1 2 --> PowerNet-MIB::rPDU2SensorTempHumidityStatusHumidityStatus.1
+# .1.3.6.1.4.1.52674.500.4.1.2.1.1.1234567 RELATIVE_HUMIDITY_ALINK_VIRTUAL_pod-XX_sensor-XX_XXXXXXXXXXXX_X-th --> NetBotz50-MIB::humiSensorId.1234567
+# .1.3.6.1.4.1.52674.500.4.1.2.1.2.1234567 32 --> NetBotz50-MIB::humiSensorValue.1234567
+# .1.3.6.1.4.1.52674.500.4.1.2.1.3.1234567 0 --> NetBotz50-MIB::humiSensorErrorStatus.1234567
+# .1.3.6.1.4.1.52674.500.4.1.2.1.4.1234567 Rack Oben --> NetBotz50-MIB::humiSensorLabel.1234567
+# .1.3.6.1.4.1.52674.500.4.1.2.1.5.1234567 ALINK_VIRTUAL_pod-XX_XXXXXXXXXXXX_X-th --> NetBotz50-MIB::humiSensorEncId.1234567
+# .1.3.6.1.4.1.52674.500.4.1.2.1.6.1234567 UNIVERSAL 1 --> NetBotz50-MIB::humiSensorPortId.1234567
+# .1.3.6.1.4.1.52674.500.4.1.2.1.7.1234567 32.0 --> NetBotz50-MIB::humiSensorValueStr.1234567
+# .1.3.6.1.4.1.52674.500.4.1.2.1.8.1234567 32 --> NetBotz50-MIB::humiSensorValueInt.1234567
+# .1.3.6.1.4.1.52674.500.4.1.2.1.9.1234567 1234567 --> NetBotz50-MIB::humiSensorIndex.1234567
 
 from cmk.agent_based.v2 import (
     CheckPlugin,
@@ -37,7 +40,7 @@ from cmk.agent_based.v2 import (
 )
 from cmk.plugins.lib.humidity import check_humidity
 
-apc_netbotz50_SENSOR_LEVEL_STATES = {
+APC_NETBOTZ50_SENSOR_LEVEL_STATES = {
     0: (State.OK, 'Sensor State: Normal'),
     1: (State.OK, 'Sensor State: Info'),
     2: (State.WARN, 'Sensor State: Warning'),
@@ -49,8 +52,8 @@ apc_netbotz50_SENSOR_LEVEL_STATES = {
 
 def parse_apc_netbotz50_sensor_humidity(string_table):
     return {
-        label: [int(value) / 10, int(status)]
-        for value, status, label in string_table
+        label: [int(value), int(status)]
+        for label, value, status in string_table
     }
 
 
@@ -61,9 +64,9 @@ snmp_section_apc_netbotz50_sensor_humidity = SimpleSNMPSection(
     fetch=SNMPTree(
         base='.1.3.6.1.4.1.52674.500.4.1.2.1',
         oids=[
-            '2',   # NetBotz50-MIB::humiSensorValue
-            '3',   # NetBotz50-MIB::humiSensorErrorStatus
             '4',   # NetBotz50-MIB::humiSensorLabel
+            '8',   # NetBotz50-MIB::humiSensorValueInt
+            '3',   # NetBotz50-MIB::humiSensorErrorStatus
         ]
     ),
 )
@@ -80,10 +83,10 @@ def check_apc_netbotz50_sensor_humidity(item, params, section):
 
     humidity, dev_status = section[item]
 
-    if dev_status in apc_netbotz50_SENSOR_LEVEL_STATES:
+    if dev_status in APC_NETBOTZ50_SENSOR_LEVEL_STATES:
         yield Result(
-            state=apc_netbotz50_SENSOR_LEVEL_STATES[dev_status][0],
-            notice=apc_netbotz50_SENSOR_LEVEL_STATES[dev_status][1]
+            state=APC_NETBOTZ50_SENSOR_LEVEL_STATES[dev_status][0],
+            notice=APC_NETBOTZ50_SENSOR_LEVEL_STATES[dev_status][1]
         )
 
     yield from check_humidity(
