@@ -3,7 +3,7 @@
 #
 # checkmk_apc_rackpdu_sensor - Checkmk extension for APC RackPDU Sensors
 #
-# Copyright (C) 2021  Marius Rieder <marius.rieder@scs.ch>
+# Copyright (C) 2021-2024  Marius Rieder <marius.rieder@durchmesser.ch>
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License
@@ -26,17 +26,17 @@
 # .1.3.6.1.4.1.318.1.1.26.10.2.2.1.10.1 10 --> PowerNet-MIB::rPDU2SensorTempHumidityStatusRelativeHumidity.1
 # .1.3.6.1.4.1.318.1.1.26.10.2.2.1.11.1 2 --> PowerNet-MIB::rPDU2SensorTempHumidityStatusHumidityStatus.1
 
-from .agent_based_api.v1 import (
+from cmk.agent_based.v2 import (
     all_of,
-    check_levels,
+    CheckPlugin,
     exists,
-    register,
-    render,
     Service,
+    SNMPSection,
     SNMPTree,
     startswith,
     State,
 )
+from cmk.plugins.lib.humidity import check_humidity
 
 apc_rackpdu_SENSOR_LEVEL_STATES = {
     1: State.CRIT,  # not present
@@ -65,7 +65,7 @@ def parse_apc_rackpdu_sensor_humidity(string_table):
     return parsed
 
 
-register.snmp_section(
+snmp_section_apc_rackpdu_sensor_humidity = SNMPSection(
     name='apc_rackpdu_sensor_humidity',
     detect=all_of(
         startswith('.1.3.6.1.2.1.1.1.0', 'APC Web/SNMP'),
@@ -104,16 +104,13 @@ def check_apc_rackpdu_sensor_humidity(item, params, section):
 
     humidity, status, warn, crit = section[item]
 
-    yield from check_levels(
-        value=humidity,
-        metric_name='humidity',
-        levels_upper=params.get('levels', None),
-        levels_lower=params.get('levels_lower', (warn, crit)),
-        render_func=render.percent,
+    yield from check_humidity(
+        humidity=humidity,
+        params=params,
     )
 
 
-register.check_plugin(
+check_plugin_apc_rackpdu_sensor_humidity = CheckPlugin(
     name='apc_rackpdu_sensor_humidity',
     service_name='%s Humidity',
     discovery_function=discovery_apc_rackpdu_sensor_humidity,
